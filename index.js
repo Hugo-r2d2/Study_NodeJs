@@ -19,24 +19,30 @@ async function main() {
   // Lista
   const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"];
 
+  const db = client.db(dbName);
+  const collection = db.collection("item");
+
   // Read All - [GET] /item
-  app.get("/item", function (req, res) {
-    res.send(lista);
+  app.get("/item", async function (req, res) {
+    // Obter todos os documentos da Collection
+    const documentos = await collection.find().toArray();
+
+    res.send(documentos);
   });
 
   // Sinalizamos para o Express que vamos usar JSON no body
   app.use(express.json());
 
   // Create - [POST] /item
-  app.post("/item", function (req, res) {
+  app.post("/item", async function (req, res) {
     // Obtemos o nome enviado no Request Body
-    const item = req.body.nome;
+    const item = req.body;
 
     // Inserimos o item no final da lista
-    lista.push(item);
+    await collection.insertOne(item);
 
     // Enviamos uma mensagem de Sucesso
-    res.send("Item Criado com Sucesso");
+    res.send(item);
   });
 
   // Read By Id - [GET] /item/:id
